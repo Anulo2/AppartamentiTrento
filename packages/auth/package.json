@@ -1,0 +1,24 @@
+{
+  "name": "@AppartamentiTrento/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@AppartamentiTrento/db": "workspace:*",
+    "@AppartamentiTrento/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@AppartamentiTrento/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

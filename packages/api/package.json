@@ -1,0 +1,29 @@
+{
+  "name": "@AppartamentiTrento/api",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@AppartamentiTrento/auth": "workspace:*",
+    "@AppartamentiTrento/db": "workspace:*",
+    "@AppartamentiTrento/env": "workspace:*",
+    "@orpc/client": "catalog:",
+    "@orpc/openapi": "catalog:",
+    "@orpc/server": "catalog:",
+    "@orpc/zod": "catalog:",
+    "dotenv": "catalog:",
+    "drizzle-orm": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@AppartamentiTrento/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
