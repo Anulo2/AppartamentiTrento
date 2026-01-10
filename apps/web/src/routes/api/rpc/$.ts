@@ -1,10 +1,11 @@
+// biome-ignore lint/style/useFilenamingConvention: convenzione TanStack Router
 import { createContext } from "@AppartamentiTrento/api/context";
 import { appRouter } from "@AppartamentiTrento/api/routers/index";
+import { experimental_ArkTypeToJsonSchemaConverter } from "@orpc/arktype";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
-import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { createFileRoute } from "@tanstack/react-router";
 
 const rpcHandler = new RPCHandler(appRouter, {
@@ -18,7 +19,7 @@ const rpcHandler = new RPCHandler(appRouter, {
 const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [
     new OpenAPIReferencePlugin({
-      schemaConverters: [new ZodToJsonSchemaConverter()],
+      schemaConverters: [new experimental_ArkTypeToJsonSchemaConverter()],
     }),
   ],
   interceptors: [
@@ -33,13 +34,17 @@ async function handle({ request }: { request: Request }) {
     prefix: "/api/rpc",
     context: await createContext({ req: request }),
   });
-  if (rpcResult.response) return rpcResult.response;
+  if (rpcResult.response) {
+    return rpcResult.response;
+  }
 
   const apiResult = await apiHandler.handle(request, {
     prefix: "/api/rpc/api-reference",
     context: await createContext({ req: request }),
   });
-  if (apiResult.response) return apiResult.response;
+  if (apiResult.response) {
+    return apiResult.response;
+  }
 
   return new Response("Not found", { status: 404 });
 }

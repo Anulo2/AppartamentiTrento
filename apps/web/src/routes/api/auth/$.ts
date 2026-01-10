@@ -1,3 +1,4 @@
+// biome-ignore lint/style/useFilenamingConvention: convenzione TanStack Router
 import { auth } from "@AppartamentiTrento/auth";
 import { createFileRoute } from "@tanstack/react-router";
 

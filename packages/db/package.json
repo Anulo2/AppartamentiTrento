@@ -10,7 +10,7 @@
     }
   },
   "scripts": {
-    "db:local": "turso dev --db-file local.db",
+    "db:local": "echo 'Database file will be created automatically at DATABASE_URL location'",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",

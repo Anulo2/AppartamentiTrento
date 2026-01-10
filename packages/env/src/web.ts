@@ -3,7 +3,9 @@ import { z } from "zod";
 
 export const env = createEnv({
   clientPrefix: "VITE_",
-  client: {},
-  runtimeEnv: (import.meta as any).env,
+  client: {
+    VITE_GEOAPIFY_API_KEY: z.string().optional(),
+  },
+  runtimeEnv: (import.meta as { env: Record<string, string | undefined> }).env,
   emptyStringAsUndefined: true,
 });
