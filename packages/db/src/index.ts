@@ -16,9 +16,16 @@ import {
   verification,
 } from "./schema";
 
-const client = createClient({
-  url: `file:${env.DATABASE_URL}`,
-});
+const client = createClient(
+  env.TURSO_DATABASE_URL
+    ? {
+        url: env.TURSO_DATABASE_URL,
+        authToken: env.TURSO_AUTH_TOKEN,
+      }
+    : {
+        url: `file:${env.DATABASE_URL}`,
+      }
+);
 
 export const db = drizzle({
   client,

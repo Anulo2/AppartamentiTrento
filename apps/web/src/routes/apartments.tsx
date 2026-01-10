@@ -589,10 +589,8 @@ function ApartmentsRoute() {
                   <ApartmentMap
                     apartments={apartments.data ?? []}
                     destination={selectedDestination}
-                    onSelectApartment={(id) => {
-                      handleEditApartment(id);
-                      setViewMode("list");
-                    }}
+                    onDeleteApartment={handleDelete}
+                    onEditApartment={handleEditApartment}
                   />
                 </Suspense>
               );

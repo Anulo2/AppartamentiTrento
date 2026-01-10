@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 
-import { Button } from "@/components/ui/button";
+import { ApartmentPopupCard } from "@/components/apartment-card-helpers";
 
 // Fix for default marker icons in webpack/vite
 // biome-ignore lint/suspicious/noExplicitAny: Leaflet icon fix requires any
@@ -46,25 +46,89 @@ const markerColors = {
   destination: "#3b82f6", // blue
 };
 
+// Helper to create cluster icon with status indicators
+function createClusterIcon(
+  // biome-ignore lint/suspicious/noExplicitAny: MarkerCluster type from react-leaflet-cluster
+  cluster: any,
+  apartments: Apartment[]
+): L.DivIcon {
+  const childMarkers = cluster.getAllChildMarkers();
+  const count = childMarkers.length;
+
+  // Count contacted and responded apartments in cluster
+  let rispostoCount = 0;
+  let contattatoCount = 0;
+
+  for (const marker of childMarkers) {
+    const latlng = marker.getLatLng();
+    const apt = apartments.find(
+      (a) => a.latitudine === latlng.lat && a.longitudine === latlng.lng
+    );
+    if (apt?.risposto) {
+      rispostoCount++;
+    } else if (apt?.contattato) {
+      contattatoCount++;
+    }
+  }
+
+  // Determine cluster color based on content
+  let bgColor = markerColors.default;
+  let borderColor = "#374151";
+  if (rispostoCount > 0) {
+    bgColor = markerColors.risposto;
+    borderColor = "#15803d";
+  } else if (contattatoCount > 0) {
+    bgColor = markerColors.contattato;
+    borderColor = "#a16207";
+  }
+
+  // Build status indicator dots
+  const dots: string[] = [];
+  if (rispostoCount > 0) {
+    dots.push(
+      `<span style="background:${markerColors.risposto}" class="cluster-dot"></span>`
+    );
+  }
+  if (contattatoCount > 0) {
+    dots.push(
+      `<span style="background:${markerColors.contattato}" class="cluster-dot"></span>`
+    );
+  }
+  const dotsHtml =
+    dots.length > 0 ? `<div class="cluster-dots">${dots.join("")}</div>` : "";
+
+  return L.divIcon({
+    html: `<div class="cluster-icon" style="background:${bgColor};border-color:${borderColor}">${count}${dotsHtml}</div>`,
+    className: "custom-cluster-icon",
+    iconSize: L.point(44, 44, true),
+  });
+}
+
 interface Apartment {
   id: number;
   luogo: string;
+  indirizzo?: string | null;
   latitudine: number | null;
   longitudine: number | null;
   tipoAlloggio: string;
-  tipoStanza: string | null;
-  costoAffitto: number | null;
-  costoUtenze: number | null;
-  costoAltro: number | null;
-  contattato: boolean | null;
-  risposto: boolean | null;
-  riferimento: string | null;
+  tipoStanza?: string | null;
+  numeroStanze?: number | null;
+  costoAffitto?: number | null;
+  costoUtenze?: number | null;
+  costoAltro?: number | null;
+  contattato?: boolean | null;
+  risposto?: boolean | null;
+  postoAuto?: boolean | null;
+  disponibileDa?: string | null;
+  riferimento?: string | null;
+  contatti?: { id: number; tipo: string; valore: string }[];
 }
 
 interface ApartmentMapProps {
   apartments: Apartment[];
   destination: { name: string; lat: number; lng: number } | null;
-  onSelectApartment: (id: number) => void;
+  onEditApartment: (id: number) => void;
+  onDeleteApartment: (id: number) => void;
 }
 
 // Helper component to fit bounds
@@ -89,7 +153,8 @@ function FitBounds({ apartments }: { apartments: Apartment[] }) {
 export function ApartmentMap({
   apartments,
   destination,
-  onSelectApartment,
+  onEditApartment,
+  onDeleteApartment,
 }: ApartmentMapProps) {
   // Filter apartments that have coordinates
   const mappableApartments = apartments.filter(
@@ -120,25 +185,6 @@ export function ApartmentMap({
       return createColoredIcon(markerColors.contattato);
     }
     return createColoredIcon(markerColors.default);
-  };
-
-  const formatCost = (apt: Apartment): string => {
-    const total =
-      (apt.costoAffitto ?? 0) + (apt.costoUtenze ?? 0) + (apt.costoAltro ?? 0);
-    if (total === 0) {
-      return "Prezzo N/D";
-    }
-    return `${total}€/mese`;
-  };
-
-  const getStatusBadge = (apt: Apartment): string => {
-    if (apt.risposto) {
-      return "✓ Risposto";
-    }
-    if (apt.contattato) {
-      return "⏳ Contattato";
-    }
-    return "○ Da contattare";
   };
 
   return (
@@ -186,61 +232,9 @@ export function ApartmentMap({
         {/* Clustered apartment markers */}
         <MarkerClusterGroup
           chunkedLoading
-          // biome-ignore lint/suspicious/noExplicitAny: MarkerCluster type from react-leaflet-cluster
-          iconCreateFunction={(cluster: any) => {
-            const childMarkers = cluster.getAllChildMarkers();
-            const count = childMarkers.length;
-
-            // Count contacted and responded apartments in cluster
-            let rispostoCount = 0;
-            let contattatoCount = 0;
-
-            for (const marker of childMarkers) {
-              const apt = mappableApartments.find(
-                (a) =>
-                  a.latitudine === marker.getLatLng().lat &&
-                  a.longitudine === marker.getLatLng().lng
-              );
-              if (apt) {
-                if (apt.risposto) rispostoCount++;
-                else if (apt.contattato) contattatoCount++;
-              }
-            }
-
-            // Determine cluster color based on content
-            let bgColor = "#6b7280"; // gray default
-            let borderColor = "#374151";
-            if (rispostoCount > 0) {
-              bgColor = "#22c55e"; // green if any responded
-              borderColor = "#15803d";
-            } else if (contattatoCount > 0) {
-              bgColor = "#eab308"; // yellow if any contacted
-              borderColor = "#a16207";
-            }
-
-            // Build status indicator dots
-            const dots = [];
-            if (rispostoCount > 0) {
-              dots.push(
-                `<span style="background:#22c55e" class="cluster-dot"></span>`
-              );
-            }
-            if (contattatoCount > 0) {
-              dots.push(
-                `<span style="background:#eab308" class="cluster-dot"></span>`
-              );
-            }
-            const dotsHtml =
-              dots.length > 0
-                ? `<div class="cluster-dots">${dots.join("")}</div>`
-                : "";
-
-            return L.divIcon({
-              html: `<div class="cluster-icon" style="background:${bgColor};border-color:${borderColor}">${count}${dotsHtml}</div>`,
-              className: "custom-cluster-icon",
-              iconSize: L.point(44, 44, true),
-            });
-          }}
+          iconCreateFunction={(cluster) =>
+            createClusterIcon(cluster, mappableApartments)
+          }
         >
           {mappableApartments.map((apt) => (
             <Marker
@@ -249,41 +243,11 @@ export function ApartmentMap({
               position={[apt.latitudine as number, apt.longitudine as number]}
             >
               <Popup>
-                <div className="min-w-[200px] space-y-2">
-                  <div>
-                    <h3 className="font-semibold">{apt.luogo}</h3>
-                    <p className="text-muted-foreground text-xs">
-                      {apt.tipoAlloggio}
-                      {apt.tipoStanza && ` - ${apt.tipoStanza}`}
-                    </p>
-                  </div>
-
-                  <div className="font-medium text-lg">{formatCost(apt)}</div>
-
-                  <div className="text-xs">{getStatusBadge(apt)}</div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      className="flex-1"
-                      onClick={() => onSelectApartment(apt.id)}
-                      size="sm"
-                      variant="outline"
-                    >
-                      Dettagli
-                    </Button>
-                    {apt.riferimento && (
-                      <a
-                        href={apt.riferimento}
-                        rel="noopener noreferrer"
-                        target="_blank"
-                      >
-                        <Button size="sm" variant="outline">
-                          Link
-                        </Button>
-                      </a>
-                    )}
-                  </div>
-                </div>
+                <ApartmentPopupCard
+                  apartment={apt}
+                  onDelete={() => onDeleteApartment(apt.id)}
+                  onEdit={() => onEditApartment(apt.id)}
+                />
               </Popup>
             </Marker>
           ))}
