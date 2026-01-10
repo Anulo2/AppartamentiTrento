@@ -3,29 +3,17 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   ArrowDown,
   ArrowUp,
-  Edit2,
-  ExternalLink,
   GitCompare,
   List,
   Loader2,
   Map as MapIcon,
   Plus,
-  Printer,
   Search,
-  Trash2,
 } from "lucide-react";
 import { lazy, Suspense, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import {
-  ApartmentDetails,
-  ContactsList,
-  formatCostBreakdown,
-  formatCostDisplay,
-  getApartmentCardStyle,
-  getApartmentDisplayName,
-  TravelInfo,
-} from "@/components/apartment-card-helpers";
+import { ApartmentCard } from "@/components/apartment-card";
 import { ApartmentForm } from "@/components/apartment-form";
 import { DestinationSearch } from "@/components/destination-search";
 import {
@@ -47,7 +35,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { useDistanceCalculation } from "@/hooks/use-distance-calculation";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 
 // Lazy load map component to avoid SSR issues with Leaflet
@@ -60,11 +47,9 @@ const ApartmentMap = lazy(() =>
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Drawer,
   DrawerContent,
@@ -767,142 +752,3 @@ type ApartmentType = NonNullable<
     ReturnType<ReturnType<typeof orpc.apartment.getAll.queryOptions>["queryFn"]>
   >
 >[0];
-
-function ApartmentCard({
-  apartment,
-  destination,
-  onEdit,
-  onDelete,
-  onToggleSelection,
-  isSelected,
-}: {
-  apartment: ApartmentType;
-  destination: { name: string; lat: number; lng: number } | null;
-  onEdit: () => void;
-  onDelete: () => void;
-  onToggleSelection: () => void;
-  isSelected: boolean;
-}) {
-  const hasCoordinates = !!apartment.latitudine && !!apartment.longitudine;
-  const { walkingTime, transitTime, isLoading } = useDistanceCalculation({
-    apartmentId: apartment.id,
-    destination,
-    hasCoordinates,
-  });
-
-  const showTravelInfo = destination && hasCoordinates;
-
-  const cardStyle = getApartmentCardStyle({
-    contattato: apartment.contattato,
-    risposto: apartment.risposto,
-  });
-
-  return (
-    <Card
-      className={`relative flex flex-col gap-0 ${cardStyle} ${isSelected ? "ring-2 ring-primary" : ""}`}
-    >
-      {/* Action buttons - absolute positioned */}
-      <div className="no-print absolute top-2 right-2 flex flex-col">
-        <Button
-          aria-label="Modifica"
-          onClick={onEdit}
-          size="icon"
-          variant="ghost"
-        >
-          <Edit2 className="h-4 w-4" />
-        </Button>
-        <Button
-          aria-label="Elimina"
-          onClick={onDelete}
-          size="icon"
-          variant="ghost"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-        <Button
-          aria-label="Stampa"
-          onClick={() => window.print()}
-          size="icon"
-          variant="ghost"
-        >
-          <Printer className="h-4 w-4" />
-        </Button>
-      </div>
-
-      <CardHeader className="pr-12 pb-1">
-        <div className="flex items-center gap-2">
-          <Checkbox
-            checked={isSelected}
-            className="no-print"
-            id={`select-${apartment.id}`}
-            onCheckedChange={onToggleSelection}
-          />
-          <CardTitle className="text-base">
-            {getApartmentDisplayName(apartment)}
-          </CardTitle>
-        </div>
-      </CardHeader>
-      <CardContent className="flex-1 space-y-3 pt-0 text-sm">
-        {/* Cost */}
-        <div>
-          <div className="font-semibold text-lg">
-            {formatCostDisplay({
-              costoAffitto: apartment.costoAffitto,
-              costoUtenze: apartment.costoUtenze,
-              costoAltro: apartment.costoAltro,
-            })}
-          </div>
-          {formatCostBreakdown({
-            costoAffitto: apartment.costoAffitto,
-            costoUtenze: apartment.costoUtenze,
-            costoAltro: apartment.costoAltro,
-          }) && (
-            <div className="text-muted-foreground text-xs">
-              {formatCostBreakdown({
-                costoAffitto: apartment.costoAffitto,
-                costoUtenze: apartment.costoUtenze,
-                costoAltro: apartment.costoAltro,
-              })}
-            </div>
-          )}
-        </div>
-
-        <ApartmentDetails
-          disponibileDa={apartment.disponibileDa}
-          numeroStanze={apartment.numeroStanze}
-          postoAuto={apartment.postoAuto ?? undefined}
-          tipoAlloggio={apartment.tipoAlloggio}
-          tipoStanza={apartment.tipoStanza}
-        />
-
-        {showTravelInfo && (
-          <TravelInfo
-            isLoading={isLoading}
-            transitTime={transitTime}
-            walkingTime={walkingTime}
-          />
-        )}
-
-        <ContactsList contatti={apartment.contatti} />
-
-        {apartment.riferimento && (
-          <a
-            className="flex items-center gap-1 text-primary text-xs hover:underline"
-            href={apartment.riferimento}
-            rel="noopener"
-            target="_blank"
-          >
-            <ExternalLink className="h-3 w-3" />
-            Link annuncio
-          </a>
-        )}
-
-        {apartment.note && (
-          <p className="text-muted-foreground text-xs italic">
-            {apartment.note}
-          </p>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
