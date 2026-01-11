@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
+    "vercel-build": "vite build && node scripts/vercel-output.js",
     "serve": "vite preview",
     "dev": "vite dev"
   },
