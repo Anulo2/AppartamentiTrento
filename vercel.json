@@ -1,5 +1,11 @@
 {
-  "buildCommand": "cd apps/web && bun run vercel-build",
+  "buildCommand": "turbo build",
   "installCommand": "bun install",
-  "framework": null
+  "outputDirectory": "apps/web/dist/client",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/$1"
+    }
+  ]
 }
