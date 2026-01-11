@@ -10,7 +10,9 @@ let serverModule;
 
 async function loadServer() {
   if (!serverModule) {
-    const serverPath = join(__dirname, '..', 'apps', 'web', 'dist', 'server', 'server.js');
+    // In Vercel deployment, the working directory is /var/task
+    // and the built files are relative to that
+    const serverPath = join(process.cwd(), 'apps', 'web', 'dist', 'server', 'server.js');
     serverModule = await import(serverPath);
   }
   return serverModule.default;
