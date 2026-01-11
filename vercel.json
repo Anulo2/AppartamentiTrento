@@ -16,7 +16,7 @@
   ],
   "functions": {
     "server/server.js": {
-      "runtime": "bun",
+      "runtime": "bun@1",
       "includeFiles": "**"
     }
   }
