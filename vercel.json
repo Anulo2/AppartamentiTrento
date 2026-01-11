@@ -1,7 +1,6 @@
 {
-  "buildCommand": "bun run build",
+  "framework": null,
+  "buildCommand": "bun run vercel-build",
   "installCommand": "bun install",
-  "devCommand": "bun run dev",
-  "framework": "vite",
-  "outputDirectory": "dist/client"
+  "devCommand": "bun run dev"
 }

@@ -5,8 +5,7 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const rootDir = join(__dirname, "..");
-const projectRoot = join(rootDir, "..", "..");
-const outputDir = join(projectRoot, ".vercel", "output");
+const outputDir = join(rootDir, ".vercel", "output");
 
 console.log("Creating Vercel Build Output API v3 structure...");
 
