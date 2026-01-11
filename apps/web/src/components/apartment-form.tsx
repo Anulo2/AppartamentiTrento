@@ -37,11 +37,11 @@ interface ApartmentFormProps {
 
 // Schema arktype per la validazione
 const apartmentFormSchema = type({
-  luogo: "string>0",
+  luogo: "string>=1",
   "indirizzo?": "string",
   "latitudine?": "string",
   "longitudine?": "string",
-  tipoAlloggio: "string>0",
+  tipoAlloggio: "string>=1",
   "tipoStanza?": "string",
   "numeroStanze?": "string",
   "costoAffitto?": "string",
