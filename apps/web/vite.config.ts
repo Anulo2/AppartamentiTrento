@@ -10,7 +10,17 @@ export default defineConfig({
     port: 3001,
   },
   ssr: {
-    noExternal: true,
+    noExternal: [
+      'react',
+      'react-dom',
+      '@tanstack/react-router',
+      '@tanstack/react-start',
+      '@tanstack/react-query',
+      'better-auth',
+      '@orpc/client',
+      '@orpc/server',
+      'drizzle-orm',
+    ],
   },
   build: {
     rollupOptions: {
