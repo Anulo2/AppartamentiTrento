@@ -1,6 +1,6 @@
 {
   "framework": null,
-  "buildCommand": "cd apps/web && bun run vercel-build",
+  "buildCommand": "turbo build --filter=web",
   "outputDirectory": "apps/web/.vercel/output",
   "installCommand": "bun install",
   "devCommand": "bun run dev"
