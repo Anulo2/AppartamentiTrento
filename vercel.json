@@ -3,6 +3,7 @@
   "outputDirectory": "apps/web/dist",
   "framework": null,
   "installCommand": "bun install",
+  "bunVersion": "1.x",
   "routes": [
     {
       "src": "/assets/(.*)",
@@ -15,7 +16,7 @@
   ],
   "functions": {
     "server/server.js": {
-      "runtime": "nodejs20.x",
+      "runtime": "bun",
       "includeFiles": "**"
     }
   }
