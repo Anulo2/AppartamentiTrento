@@ -9,6 +9,9 @@ export default defineConfig({
   server: {
     port: 3001,
   },
+  ssr: {
+    noExternal: true,
+  },
   build: {
     rollupOptions: {
       output: {
