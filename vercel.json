@@ -1,0 +1,22 @@
+{
+  "buildCommand": "turbo build",
+  "outputDirectory": "apps/web/dist",
+  "framework": null,
+  "installCommand": "bun install",
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/client/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/server"
+    }
+  ],
+  "functions": {
+    "server/server.js": {
+      "runtime": "nodejs20.x",
+      "includeFiles": "**"
+    }
+  }
+}

@@ -14,8 +14,7 @@
     "@AppartamentiTrento/db": "workspace:*",
     "@AppartamentiTrento/env": "workspace:*",
     "better-auth": "catalog:",
-    "dotenv": "catalog:",
-    "zod": "catalog:"
+    "dotenv": "catalog:"
   },
   "devDependencies": {
     "@AppartamentiTrento/config": "workspace:*",
