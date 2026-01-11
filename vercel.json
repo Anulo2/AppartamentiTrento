@@ -1,4 +1,5 @@
 {
   "buildCommand": "turbo build",
-  "bunVersion": "1.1"
+  "installCommand": "bun install",
+  "outputDirectory": "apps/web/.vercel/output"
 }
