@@ -12,6 +12,8 @@ console.log("Creating Vercel Build Output API v3 structure...");
 // Clean and create output directory
 if (existsSync(outputDir)) {
   console.log("Removing existing .vercel/output directory...");
+  const { rmSync } = await import('node:fs');
+  rmSync(outputDir, { recursive: true, force: true });
 }
 mkdirSync(outputDir, { recursive: true });
 
@@ -30,8 +32,8 @@ const config = {
       handle: "filesystem",
     },
     {
-      src: ".*",
-      dest: "/api/index",
+      src: "/(.*)",
+      dest: "/index",
     },
   ],
 };
@@ -55,9 +57,9 @@ if (existsSync(clientDir)) {
 const functionsDir = join(outputDir, "functions");
 mkdirSync(functionsDir, { recursive: true });
 
-// Create API function directory
-const apiFunctionDir = join(functionsDir, "api", "index.func");
-mkdirSync(apiFunctionDir, { recursive: true });
+// Create index function directory
+const indexFunctionDir = join(functionsDir, "index.func");
+mkdirSync(indexFunctionDir, { recursive: true });
 
 // Create .vc-config.json for the function
 const vcConfig = {
@@ -68,20 +70,18 @@ const vcConfig = {
 };
 
 writeFileSync(
-  join(apiFunctionDir, ".vc-config.json"),
+  join(indexFunctionDir, ".vc-config.json"),
   JSON.stringify(vcConfig, null, 2),
 );
 console.log("✓ Created function config");
 
 // Create the serverless function handler
 const serverHandler = `
-import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const require = createRequire(import.meta.url);
 
 // Import the TanStack Start server
 let server;
@@ -91,13 +91,15 @@ export default async function handler(req, res) {
     // Lazy load the server module
     if (!server) {
       const serverPath = join(__dirname, 'server.js');
-      server = await import(serverPath);
+      const serverModule = await import(serverPath);
+      server = serverModule.default;
     }
 
     // Convert Vercel request to Web API Request
     const protocol = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers['x-forwarded-host'] || req.headers.host;
-    const url = new URL(req.url || '/', \`\${protocol}://\${host}\`);
+    const pathname = req.url || '/';
+    const url = new URL(pathname, \`\${protocol}://\${host}\`);
 
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
@@ -125,14 +127,14 @@ export default async function handler(req, res) {
       }
     }
 
-    const request = new Request(url, {
+    const request = new Request(url.toString(), {
       method: req.method,
       headers,
       body,
     });
 
     // Call the TanStack Start fetch handler
-    const response = await server.default.fetch(request);
+    const response = await server.fetch(request);
 
     // Set status
     res.status(response.status);
@@ -142,39 +144,47 @@ export default async function handler(req, res) {
       res.setHeader(key, value);
     });
 
+    // Get content type
+    const contentType = response.headers.get('content-type') || '';
+
     // Stream or send the response body
     if (response.body) {
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let result = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        result += decoder.decode(value, { stream: true });
+      if (contentType.includes('text/html') || contentType.includes('application/json') || contentType.includes('text/')) {
+        const text = await response.text();
+        res.send(text);
+      } else {
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        res.send(buffer);
       }
-
-      res.send(result);
     } else {
       res.end();
     }
   } catch (error) {
     console.error('Server error:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: error.message
-    });
+    console.error('Stack:', error.stack);
+    res.status(500).send(\`
+      <!DOCTYPE html>
+      <html>
+        <head><title>500 - Server Error</title></head>
+        <body>
+          <h1>500 - Internal Server Error</h1>
+          <pre>\${error.message}</pre>
+          <pre>\${error.stack}</pre>
+        </body>
+      </html>
+    \`);
   }
 }
 `;
 
-writeFileSync(join(apiFunctionDir, "index.mjs"), serverHandler.trim());
+writeFileSync(join(indexFunctionDir, "index.mjs"), serverHandler.trim());
 console.log("✓ Created serverless function handler");
 
 // Copy server dist to the function directory
 const serverDir = join(rootDir, "dist", "server");
 if (existsSync(serverDir)) {
-  cpSync(serverDir, apiFunctionDir, { recursive: true });
+  cpSync(serverDir, indexFunctionDir, { recursive: true });
   console.log("✓ Copied server bundle to function directory");
 } else {
   console.warn("⚠ Server dist directory not found");
