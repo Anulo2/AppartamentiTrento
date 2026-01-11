@@ -190,24 +190,5 @@ if (existsSync(serverDir)) {
   console.warn("⚠ Server dist directory not found");
 }
 
-// Create package.json for the function with required dependencies
-const functionPackageJson = {
-  type: "module",
-  dependencies: {
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "@tanstack/react-router": "^1.141.1",
-    "@tanstack/react-start": "^1.141.1",
-    "arktype": "^2.1.29",
-    "zod": "^3.24.1"
-  }
-};
-
-writeFileSync(
-  join(indexFunctionDir, "package.json"),
-  JSON.stringify(functionPackageJson, null, 2)
-);
-console.log("✓ Created package.json for function dependencies");
-
 console.log("\n✅ Vercel output structure created successfully!");
 console.log(`Output directory: ${outputDir}`);

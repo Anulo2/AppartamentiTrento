@@ -9,8 +9,18 @@ export default defineConfig({
   server: {
     port: 3001,
   },
+  ssr: {
+    noExternal: true,
+  },
   build: {
     rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress circular dependency warnings for arktype
+        if (warning.code === 'CIRCULAR_DEPENDENCY' && warning.message.includes('arktype')) {
+          return;
+        }
+        warn(warning);
+      },
       output: {
         manualChunks: (id) => {
           // Split React and React-DOM into separate chunk
