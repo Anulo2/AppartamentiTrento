@@ -1,4 +1,7 @@
 {
-  "buildCommand": "turbo build",
-  "installCommand": "bun install"
+  "buildCommand": "bun run build",
+  "installCommand": "bun install",
+  "devCommand": "bun run dev",
+  "framework": "vite",
+  "outputDirectory": "dist/client"
 }
