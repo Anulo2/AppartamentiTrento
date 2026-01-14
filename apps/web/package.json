@@ -18,7 +18,6 @@
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
     "@orpc/tanstack-query": "^1.12.2",
-    "@orpc/zod": "catalog:",
     "arktype": "catalog:",
     "@tailwindcss/vite": "^4.1.8",
     "@tanstack/react-form": "^1.23.5",
@@ -44,8 +43,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.3",
     "tw-animate-css": "^1.2.5",
-    "vite-tsconfig-paths": "^5.1.4",
-    "zod": "catalog:"
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "devDependencies": {
     "@AppartamentiTrento/config": "workspace:*",

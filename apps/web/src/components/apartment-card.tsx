@@ -103,7 +103,7 @@ export function ApartmentCard({
         </Button>
       </div>
 
-      <CardHeader className={compact ? "p-3 pb-1 pr-28" : "pr-12 pb-1"}>
+      <CardHeader className={compact ? "p-3 pr-28 pb-1" : "pr-12 pb-1"}>
         <div className="flex items-center gap-2">
           {!compact && onToggleSelection && (
             <Checkbox
@@ -123,7 +123,11 @@ export function ApartmentCard({
       >
         {/* Cost */}
         <div>
-          <div className={compact ? "font-semibold text-base" : "font-semibold text-lg"}>
+          <div
+            className={
+              compact ? "font-semibold text-base" : "font-semibold text-lg"
+            }
+          >
             {formatCostDisplay({
               costoAffitto: apartment.costoAffitto,
               costoUtenze: apartment.costoUtenze,

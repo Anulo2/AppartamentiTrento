@@ -1,21 +1,14 @@
 import "dotenv/config";
-import { createEnv } from "@t3-oss/env-core";
-import { z } from "zod";
+import arkenv from "arkenv";
 
-export const env = createEnv({
-  server: {
-    DATABASE_URL: z.string().min(1),
-    TURSO_DATABASE_URL: z.string().url().optional(),
-    TURSO_AUTH_TOKEN: z.string().min(1).optional(),
-    BETTER_AUTH_SECRET: z.string().min(32),
-    BETTER_AUTH_URL: z.url(),
-    CORS_ORIGIN: z.url(),
-    OPENROUTESERVICE_API_KEY: z.string().optional(),
-    GEOAPIFY_API_KEY: z.string().optional(),
-    NODE_ENV: z
-      .enum(["development", "production", "test"])
-      .default("development"),
-  },
-  runtimeEnv: process.env,
-  emptyStringAsUndefined: true,
+export const env = arkenv({
+  DATABASE_URL: "string >= 1",
+  TURSO_DATABASE_URL: "string.url | undefined",
+  TURSO_AUTH_TOKEN: "string >= 1 | undefined",
+  BETTER_AUTH_SECRET: "string >= 32",
+  BETTER_AUTH_URL: "string.url",
+  CORS_ORIGIN: "string.url",
+  OPENROUTESERVICE_API_KEY: "string | undefined",
+  GEOAPIFY_API_KEY: "string | undefined",
+  NODE_ENV: "'development' | 'production' | 'test' = 'development'",
 });

@@ -21,8 +21,7 @@
     "@libsql/client": "catalog:",
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
-    "libsql": "catalog:",
-    "zod": "catalog:"
+    "libsql": "catalog:"
   },
   "devDependencies": {
     "@AppartamentiTrento/config": "workspace:*",

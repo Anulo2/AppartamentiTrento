@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 
-import { ApartmentPopupCard } from "@/components/apartment-card-helpers";
+import { ApartmentCard } from "@/components/apartment-card";
 
 // Fix for default marker icons in webpack/vite
 // biome-ignore lint/suspicious/noExplicitAny: Leaflet icon fix requires any
@@ -243,8 +243,9 @@ export function ApartmentMap({
               position={[apt.latitudine as number, apt.longitudine as number]}
             >
               <Popup>
-                <ApartmentPopupCard
+                <ApartmentCard
                   apartment={apt}
+                  compact
                   onDelete={() => onDeleteApartment(apt.id)}
                   onEdit={() => onEditApartment(apt.id)}
                 />

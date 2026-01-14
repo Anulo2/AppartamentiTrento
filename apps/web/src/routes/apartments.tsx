@@ -47,6 +47,7 @@ const ApartmentMap = lazy(() =>
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
