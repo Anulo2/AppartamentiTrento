@@ -8,15 +8,15 @@ import { publicProcedure } from "../index";
 
 const contattoSchema = type({
   tipo: "'telefono' | 'email' | 'nome'",
-  valore: "string>0",
+  valore: "string>=1",
 });
 
 const apartmentSchema = type({
-  luogo: "string>0",
+  luogo: "string>=1",
   "indirizzo?": "string | null",
   "latitudine?": "number | null",
   "longitudine?": "number | null",
-  tipoAlloggio: "string>0",
+  tipoAlloggio: "string>=1",
   "tipoStanza?": "string | null",
   "numeroStanze?": "number>0 | null",
   "costoAffitto?": "number>=0 | null",
@@ -349,7 +349,7 @@ export const apartmentRouter = {
       type({
         apartmentId: "number",
         tipo: "'telefono' | 'email' | 'nome'",
-        valore: "string>0",
+        valore: "string>=1",
       })
     )
     .handler(async ({ input }) => {
@@ -568,7 +568,7 @@ export const apartmentRouter = {
   geocodeAddress: publicProcedure
     .input(
       type({
-        address: "string>0",
+        address: "string>=1",
       })
     )
     .handler(async ({ input }) => {

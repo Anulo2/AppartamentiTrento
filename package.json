@@ -39,6 +39,8 @@
     "@orpc/arktype": "^1.13.2",
     "arktype": "^2.1.29",
     "dotenv": "catalog:",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
     "react-leaflet-cluster": "^4.0.0"
   },
   "devDependencies": {
